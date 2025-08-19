@@ -40,8 +40,8 @@ RUN wget --no-verbose https://s3.amazonaws.com/rstudio-shiny-server-os-build/ubu
 ## CRAN packages
 RUN R -e "install.packages(c('rsconnect', 'shiny', 'shinyjs', 'ggplot2', 'matrixStats', 'e1071', 'boot', 'leaps', 'randomForest', 'shinyjs', 'DT', 'class', 'caret', 'plotly', 'd3r', 'matrixStats', 'shinythemes', 'reshape2', 'truncnorm', 'stringr', 'dplyr', 'zoo', 'shinycssloaders', 'shinydashboard', 'purrr', 'readr', 'data.table'))"
 
-ARG ACCESS_TOKEN
-RUN git clone https://$ACCESS_TOKEN@github.com/prasven/CRSSI.git
+ARG ACCESS_TOKEN_3
+RUN git clone https://$ACCESS_TOKEN_3@github.com/prasven/CRSSI.git
 
 # Get the app code and copy configuration files into the Docker image
 ### RUN git clone https://github.com/prasven/CRSSI.git
