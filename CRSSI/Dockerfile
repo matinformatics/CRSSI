@@ -58,7 +58,7 @@ ENV R_HOME=/usr/lib/R
 ENV PATH=/usr/lib/R:/usr/lib/R/bin:$PATH
 EXPOSE 80
 WORKDIR /srv/shiny-server
-RUN chown shiny.shiny /usr/bin/shiny-server.sh && chmod 755 /usr/bin/shiny-server.sh
+RUN chown shiny:shiny /usr/bin/shiny-server.sh && chmod 755 /usr/bin/shiny-server.sh
 
 # Run the server setup script
 CMD ["/usr/bin/shiny-server.sh"]
