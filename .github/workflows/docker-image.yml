@@ -1,0 +1,67 @@
+name: Container Build CICD
+
+on:
+  push:
+    branches: 
+    - 'master'
+
+env:
+  # The preferred container registry
+  REGISTRY: ghcr.io
+  # The base org/image-name for the container
+  IMAGE_NAME: prasven/crssi
+  # A service name if mapping this to a k8s deployment
+  SVC_NAME: crssi
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set ENV
+        run: echo "IMAGE_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        # GHCR require a GitHub username and a Personal Access Token with the right permissions.
+        # These can be stored as repository secrets in the repo settings.
+        name: Login to GHCR
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_PAT }}
+      -
+        name: Build and push
+        #env:
+        #  DOCKER_TOKEN: ${{ secrets.GHCR_PAT }}
+        id: docker_build
+        uses: docker/build-push-action@v2
+        #run: |
+        #  echo $DOCKER_TOKEN | docker login ghcr.io -u prasven --password-stdin
+        #  docker build -t ghcr.io/prasven/crssi ./CRSSI
+        #  docker push ghcr.io/prasven/uvamsequals
+        with:
+          context: ./CRSSI
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ghcr.io/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            ACCESS_TOKEN_3=${{ secrets.ACCESS_TOKEN_3 }}
+          
+      -
+        name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+      # Now update another repo so that ArgoCD can deploy the new version.
+      # Note that the dispatch call simply curls a POST payload to another repository with JSON that you define.
+      - name: Remote Dispatch
+        run: |
+          curl -X POST https://api.github.com/repos/uvarc/uvarc-services/dispatches \
+            -H 'Accept: application/vnd.github.everest-preview+json' \
+            -H "Authorization: token ${{ secrets.GHCR_PAT }}" \
+            --data '{"event_type": "${{ env.IMAGE_NAME }} update to ${{ env.IMAGE_TAG }}", "client_payload": { "service": "${{ env.SVC_NAME }}", "version": "${{ env.IMAGE_TAG }}" }}'
