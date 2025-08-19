@@ -44,7 +44,7 @@ jobs:
         #run: |
         #  echo $DOCKER_TOKEN | docker login ghcr.io -u prasven --password-stdin
         #  docker build -t ghcr.io/prasven/crssi ./CRSSI
-        #  docker push ghcr.io/prasven/uvamsequals
+        #  docker push ghcr.io/prasven/crssi
         with:
           context: ./CRSSI
           push: ${{ github.event_name != 'pull_request' }}
