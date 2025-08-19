@@ -41,16 +41,16 @@ RUN wget --no-verbose https://s3.amazonaws.com/rstudio-shiny-server-os-build/ubu
 RUN R -e "install.packages(c('rsconnect', 'shiny', 'shinyjs', 'ggplot2', 'matrixStats', 'e1071', 'boot', 'leaps', 'randomForest', 'shinyjs', 'DT', 'class', 'caret', 'plotly', 'd3r', 'matrixStats', 'shinythemes', 'reshape2', 'truncnorm', 'stringr', 'dplyr', 'zoo', 'shinycssloaders', 'shinydashboard', 'purrr', 'readr', 'data.table'))"
 
 ARG ACCESS_TOKEN_3
-RUN git clone https://$ACCESS_TOKEN_3@github.com/prasven/CRSSI.git
+RUN git clone https://$ACCESS_TOKEN_3@github.com/prasven/CRSSI/CRSSI.git
 
 # Get the app code and copy configuration files into the Docker image
-### RUN git clone https://github.com/prasven/CRSSI.git
-RUN cp CRSSI/shiny-server.conf /etc/shiny-server/shiny-server.conf
-RUN cp CRSSI/shiny-server.sh /usr/bin/shiny-server.sh
+### RUN git clone https://github.com/prasven/CRSSI/CRSSI.git
+RUN cp CRSSI/CRSSI/shiny-server.conf /etc/shiny-server/shiny-server.conf
+RUN cp CRSSI/CRSSI/shiny-server.sh /usr/bin/shiny-server.sh
 RUN rm -rf /srv/shiny-server/*
-RUN rm CRSSI/shiny-server.*
+RUN rm CRSSI/CRSSI/shiny-server.*
 
-RUN cp -r CRSSI/* /srv/shiny-server/
+RUN cp -r CRSSI/CRSSI/* /srv/shiny-server/
 RUN rm -rf CRSSI
 
 # Make the ShinyApp available at port 80
