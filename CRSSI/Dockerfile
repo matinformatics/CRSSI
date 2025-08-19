@@ -38,7 +38,7 @@ RUN wget --no-verbose https://s3.amazonaws.com/rstudio-shiny-server-os-build/ubu
     
 ##### Install R packages that are required ######
 ## CRAN packages
-RUN R -e "install.packages(c('rsconnect', 'shiny', 'shinyjs', 'ggplot2', 'matrixStats', 'e1071', 'boot', 'leaps', 'randomForest', 'shinyjs', 'DT', 'class', 'caret', 'plotly', 'd3r', 'matrixStats', 'shinythemes', 'reshape2', 'truncnorm', 'stringr', 'dplyr', 'zoo', 'shinycssloaders', 'shinydashboard', 'purrr', 'readr', 'data.table'))"
+RUN R -e "install.packages(c('rsconnect', 'shiny', 'shinyjs', 'ggplot2', 'matrixStats', 'e1071', 'boot', 'leaps', 'randomForest', 'shinyjs', 'DT', 'class', 'caret', 'plotly', 'd3r', 'matrixStats', 'shinythemes', 'reshape2', 'truncnorm', 'stringr', 'dplyr', 'zoo', 'shinycssloaders', 'shinydashboard', 'purrr', 'readr', 'data.table', 'xgboost'))"
 
 ARG ACCESS_TOKEN_3
 RUN git clone https://${ACCESS_TOKEN_3}@github.com/prasven/CRSSI.git
