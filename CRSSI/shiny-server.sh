@@ -21,4 +21,6 @@ fi
 echo "Directory created successfully:"
 ls -la /var/log/ | grep shiny-server
 
+echo "Absolute path: $(realpath /var/log/shiny-server)"
+
 exec shiny-server >> /var/log/shiny-server.log 2>&1
