@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e  # Exit on any error
 
-mkdir -p /var/log/shiny-server || {
+sudo mkdir -p /var/log/shiny-server || {
     echo "Failed to create directory"
     exit 1
 }
