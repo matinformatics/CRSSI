@@ -1,71 +1,40 @@
-# Install R version 4.5.0
-FROM r-base:4.5.0
+FROM rocker/r-ver:4.5.0
 
-# Install Ubuntu packages
-RUN apt-get update && apt-get install -y \
-    sudo \
-    gdebi-core \
-    pandoc \
-    libcurl4-gnutls-dev \
-    libcairo2-dev/unstable \
-    libxt-dev \
-    libssl-dev \
-    libxml2-dev \
-    libnlopt-dev \
-    libudunits2-dev \
-    libgeos-dev \
-    libfreetype6-dev \
-    libpng-dev \
-    libtiff5-dev \
-    libjpeg-dev \
-    libgdal-dev \
-    git \
-    libpython3-dev \
-    python3-dev \
-    python3-pip     
-    
-# Install Shiny server
-RUN wget --no-verbose https://s3.amazonaws.com/rstudio-shiny-server-os-build/ubuntu-12.04/x86_64/VERSION -O "version.txt" && \
-    VERSION=$(cat version.txt) && \
-    wget "https://s3.amazonaws.com/rstudio-shiny-server-os-build/ubuntu-12.04/x86_64/shiny-server-$VERSION-amd64.deb" -O ss-latest.deb && \
-    gdebi -n ss-latest.deb && \
-    rm -f version.txt ss-latest.deb
-    
-    
-##### Install required python packages #####
+# Install Ubuntu packages needed to build and run common R packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    sudo gdebi-core pandoc git \
+    libcurl4-openssl-dev libssl-dev libxml2-dev \
+    libcairo2-dev libxt-dev libnlopt-dev libudunits2-dev \
+    libgeos-dev libgdal-dev \
+    libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev \
+    libpython3-dev python3-dev python3-pip \
+    automake autoconf libtool make pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
-### RUN pip install numpy chaospy pandas dill rpy2 multiprocess --break-system-packages    
-    
-##### Install R packages that are required ######
-## CRAN packages
-RUN R -e "install.packages(c('rsconnect', 'shiny', 'shinyjs', 'ggplot2', 'matrixStats', 'e1071', 'boot', 'leaps', 'randomForest', 'shinyjs', 'DT', 'class', 'caret', 'plotly', 'shinythemes', 'reshape2', 'truncnorm', 'stringr', 'dplyr', 'zoo', 'shinycssloaders', 'shinydashboard', 'data.table', 'xgboost', 'mlbench', 'broom', 'shinyWidget', 'shinyalert'))"
+# Install all needed R packages
+RUN R -e "install.packages(c('rsconnect', 'shiny', 'shinyjs', 'ggplot2', 'matrixStats', 'e1071', 'boot', \
+    'leaps', 'randomForest', 'shinyjs', 'DT', 'class', 'caret', 'plotly', 'shinythemes', 'reshape2', \
+    'truncnorm', 'stringr', 'dplyr', 'zoo', 'shinycssloaders', 'shinydashboard', 'data.table', 'xgboost', \
+    'mlbench', 'broom', 'shinyWidgets', 'shinyalert'))"
 
-ARG ACCESS_TOKEN_3
-RUN git clone https://${ACCESS_TOKEN_3}@github.com/prasven/CRSSI.git
+# Copy configuration and app (adjust paths as needed)
+#COPY CRSSI/CRSSI/shiny-server.conf /etc/shiny-server/shiny-server.conf
+#COPY CRSSI/CRSSI/shiny-server.sh   /usr/bin/shiny-server.sh
+COPY CRSSI/CRSSI/ui.R        /srv/shiny-server/
+COPY CRSSI/CRSSI/server.R        /srv/shiny-server/
 
-# Get the app code and copy configuration files into the Docker image
-### RUN git clone https://github.com/prasven/CRSSI.git
-
-RUN mkdir -p /etc/shiny-server && \
-    cp CRSSI/CRSSI/shiny-server.conf /etc/shiny-server/shiny-server.conf
-RUN cp CRSSI/CRSSI/shiny-server.sh /usr/bin/shiny-server.sh
-RUN rm -rf /srv/shiny-server/*
-
-###RUN git clone https://github.com/prasven/crissi.git
-### RUN cp crissi/* /srv/shiny-server/
-
-
-### RUN rm CRSSI/CRSSI/shiny-server.*
-
-##RUN cp -r CRSSI/CRSSI/* /srv/shiny-server/
-RUN rm -rf CRSSI
-
-# Make the ShinyApp available at port 80
+# Environment variables
 ENV R_HOME=/usr/lib/R
 ENV PATH=/usr/lib/R:/usr/lib/R/bin:$PATH
-EXPOSE 80
-WORKDIR /srv/shiny-server
-RUN chown shiny:shiny /usr/bin/shiny-server.sh && chmod 755 /usr/bin/shiny-server.sh
 
-# Run the server setup script
-CMD ["/usr/bin/shiny-server.sh"]
+# Permissions
+#RUN chmod 755 /usr/bin/shiny-server.sh
+
+# Expose port
+EXPOSE 3838
+
+# Run the app directly with shiny (no shiny-server needed for a single app)
+#CMD ["R", "-e", "shiny::runApp('/srv/shiny-server', host='0.0.0.0', port=3838)"]
+#CMD ["R", "-e", "shiny::runApp('/srv/shiny-server', host='0.0.0.0', port=3838, launch.browser=FALSE, options=list(shiny.http2=FALSE))"]
+CMD ["R", "-e", "options(shiny.http2=FALSE, shiny.launch.browser=FALSE); shiny::runApp('/srv/shiny-server', host='0.0.0.0', port=3838)"]
+
