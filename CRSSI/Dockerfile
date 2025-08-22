@@ -20,8 +20,8 @@ RUN R -e "install.packages(c('rsconnect', 'shiny', 'shinyjs', 'ggplot2', 'matrix
 # Copy configuration and app (adjust paths as needed)
 #COPY CRSSI/CRSSI/shiny-server.conf /etc/shiny-server/shiny-server.conf
 #COPY CRSSI/CRSSI/shiny-server.sh   /usr/bin/shiny-server.sh
-COPY CRSSI/CRSSI/ui.R        /srv/shiny-server/
-COPY CRSSI/CRSSI/server.R        /srv/shiny-server/
+COPY ui.R        /srv/shiny-server/
+COPY server.R        /srv/shiny-server/
 
 # Environment variables
 ENV R_HOME=/usr/lib/R
