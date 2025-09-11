@@ -40,10 +40,10 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: yaml-files
-              mountPath: /srv/shiny-server/yaml_files
+            - name: crssi-storage
+              mountPath: /srv/shiny-server
       volumes:
-        - name: yaml-files
+        - name: crssi-storage
           persistentVolumeClaim:
             claimName: crssi-cephfs-pvc
       {{- with .Values.nodeSelector }}
