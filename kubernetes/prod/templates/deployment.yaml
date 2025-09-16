@@ -45,7 +45,7 @@ spec:
       volumes:
         - name: crssi-storage
           persistentVolumeClaim:
-            claimName: crssi-cephfs-pvc
+            claimName: crssi-nfs-pvc
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
